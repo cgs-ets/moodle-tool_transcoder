@@ -1,0 +1,6 @@
+{
+    "require": {
+        "php-ffmpeg/php-ffmpeg": "^0.16.0",
+        "paquettg/php-html-parser": "^2.2"
+    }
+}
