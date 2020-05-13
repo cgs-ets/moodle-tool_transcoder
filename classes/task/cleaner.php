@@ -104,28 +104,28 @@ class cleaner extends \core\task\scheduled_task {
             }
 
             // Find content references to the files.
-            list($pages, $labels) = find_filename_in_content($file);
-            list($pages2, $labels2) = find_filename_in_content($newfile);
+            $found1 = array_filter(find_filename_in_content($file));
+            $found2 = array_filter(find_filename_in_content($newfile));
 
             // Check whether there are any references to the original and transcoded files.
-            if (empty($pages) && empty($labels) && empty($pages2) && empty($labels2)) {
+            if (empty($found1) && empty($found2)) {
                 $this->log("Deleting transcoded files as neither the original file nor the transcoded files were referenced in any content.", 2);
                 $this->delete_newfile_from_task($task);
                 continue;
             }
 
             // If the transcoded file is not referenced where the original file is, pop a reference into the html.
-            $pageids = array_diff(array_keys($pages), array_keys($pages2));
-            if ($pageids) {
-                $pages = array_filter($pages, function ($key) use ($pageids) { return in_array($key, $pageids); }, ARRAY_FILTER_USE_KEY );
-                $this->log("Transcoded file $task->newfileid was missing in pages " . json_encode($pageids) . ", adding back in.", 1);
-                update_html_video($this->get_trace(), $file, $newfile, $pages, 'page', 'content');
-            }
-            $labelids = array_diff(array_keys($labels), array_keys($labels2));
-            if ($labelids) {
-                $labels = array_filter($labels, function ($key) use ($labelids) { return in_array($key, $labelids); }, ARRAY_FILTER_USE_KEY );
-                $this->log("Transcoded file $task->newfileid was missing in labels " . json_encode($labelids) . ", adding back in.", 1);
-                update_html_video($this->get_trace(), $file, $newfile, $labels, 'label', 'intro');
+            foreach ($found1 as $modcol => $entries) {
+                if (isset($found2[$modcol])) {
+                    $ids = array_diff(array_keys($entries), array_keys($found2[$modcol]));
+                    if ($ids) {
+                        $mod = explode('_', $modcol)[0];
+                        $col = explode('_', $modcol)[1];
+                        $entries = array_filter($entries, function ($key) use ($ids) { return in_array($key, $ids); }, ARRAY_FILTER_USE_KEY );
+                        $this->log("Transcoded file $task->newfileid was missing in $mod entries " . json_encode($ids) . ", adding back in.", 1);
+                        update_html_video($this->get_trace(), $file, $newfile, $entries, $mod, $col);
+                    }
+                }
             }
         }
 

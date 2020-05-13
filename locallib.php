@@ -37,20 +37,81 @@ define('TRANSCODER_STATUS_FAILED', 3);
 define('TRANSCODER_MAX_RETRIES', 3);
 
 
+/**
+ * Searches HTML content for references to a file.
+ * Tables with HTML fields to check:
+ *   assign, intro = Assignment Description
+ *   book, intro = Book Introduction
+ *   book_chapters, content = Book Chapter
+ *   course, summary = Course Summary
+ *   folder, intro = Folder Introduction
+ *   forum, intro = Forum Introduction
+ *   label, intro = Label Content
+ *   page, intro = Page Introduction
+ *   page, content = Page Content
+ *   question, questiontext = Quiz Questions
+ *   quiz, intro = Quiz Introduction
+ *   url, intro = URL Introduction
+ *   wiki, intro = Wiki Introduction
+ *   wiki_pages, cachedcontent = Wiki Pages
+ *
+ * @param stdClass $file The file record to search for.
+ * @param array Array of records with matches.
+ */
 function find_filename_in_content($file) {
-    global $DB;
+    $modcols = array(
+        array('mod' => 'assign', 'col' => 'intro'),
+        array('mod' => 'book', 'col' => 'intro'),
+        array('mod' => 'book_chapters', 'col' => 'content'),
+        array('mod' => 'course', 'col' => 'summary'),
+        array('mod' => 'folder', 'col' => 'intro'),
+        array('mod' => 'forum', 'col' => 'intro'),
+        array('mod' => 'label', 'col' => 'intro'),
+        array('mod' => 'page', 'col' => 'intro'),
+        array('mod' => 'page', 'col' => 'content'),
+        array('mod' => 'question', 'col' => 'questiontext'),
+        array('mod' => 'quiz', 'col' => 'intro'),
+        array('mod' => 'url', 'col' => 'intro'),
+        array('mod' => 'wiki', 'col' => 'intro'),
+        array('mod' => 'wiki_pages', 'col' => 'cachedcontent'),
+    );
 
-    // Look for current references to this file in page content.
-    $sql = 'SELECT * FROM {page} WHERE ' . $DB->sql_like('content', ':filename');
-    $params = array('filename' => '%' . $file->filename . '%');
+    $matches = array();
+    foreach ($modcols as $modcol) {
+        $mod = $modcol['mod'];
+        $col = $modcol['col'];
+        $key = $mod . '_' . $col;
+        $matches[$key] = find_filename_in_mod_col($file, $mod, $col);
+    }
+
+    /*// Pages
+    $sql = 'SELECT * FROM {page} WHERE ' . $DB->sql_like('content', ':filename1') . ' OR ' . $DB->sql_like('intro', ':filename2');
+    $params = array(
+        'filename1' => '%' . $file->filename . '%'
+        'filename2' => '%' . $file->filename . '%'
+    );
     $pages = $DB->get_records_sql($sql, $params);
 
-    // Look for current references to this file in label content.
+    // Labels
     $sql = 'SELECT * FROM {label} WHERE ' . $DB->sql_like('intro', ':filename');
     $params = array('filename' => '%' . $file->filename . '%');
     $labels = $DB->get_records_sql($sql, $params);
 
-    return array($pages, $labels);
+    return array($pages, $labels);*/
+
+    var_export($matches);
+
+    return $matches;
+}
+
+function find_filename_in_mod_col($file, $mod, $col) {
+    global $DB;
+
+    $sql = "SELECT * FROM {{$mod}} WHERE " . $DB->sql_like($col, ':filename');
+    $params = array('filename' => '%' . $file->filename . '%');
+    $matches = $DB->get_records_sql($sql, $params);
+
+    return $matches;
 }
 
 /**

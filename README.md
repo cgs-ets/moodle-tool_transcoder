@@ -1,12 +1,12 @@
 # Transcoder plugin for Moodle.
-An admin tool that automatically crawls Moodle's file store for video and audio files used in page and label content and transcodes them to mp4 and mp3 using FFmpeg. The HTML is automatically updated to include the transcoded files as an additional source for the video and audio html5 tags. The original formats are preserved as a source. This plugin was initially created to add cross browser compatibility (specifically Safari on Apple operating systems) for WebRTC based audio and video recordings using the Atto editor.
+An admin tool that automatically crawls Moodle's file store for video and audio files and transcodes them to mp4 and mp3 using FFmpeg. The HTML is automatically updated to include the transcoded files as an additional source for the video and audio html5 tags. The original formats are preserved as a source. This plugin was initially created to add cross browser compatibility (specifically Safari on Apple operating systems) for WebRTC based audio and video recordings using the Atto editor.
 
 ## Author
 [Michael Vangelovski](https://github.com/michaelvangelovski/)
 
 ## How it works
  - A crawler cron task runs every minute to look for video and audio files. Files that have already been transcoded are skipped.
- - A check is performed to see whether the file is visible on the site. Files that are not used/referenced in page or label content are skipped.
+ - A check is performed to see whether the file is visible on the site. Files that are not used/referenced in html content are skipped.
  - The files are then added to a queue in a custom table.
  - If Moodle's cron handler is used (see `disablecron` setting), the crawler creates the next set of adhoc transcoder tasks, limited to the `concurrenylimit`
  - The actual transcoding is performed by a separate transcoder task. By default the plugin does not use Moodle's cron to handle this (see `disablecron` setting) and assumes you will run the transcoder task via a custom scheduler that executes the cli command.

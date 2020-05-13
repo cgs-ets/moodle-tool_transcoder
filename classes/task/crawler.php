@@ -82,13 +82,14 @@ class crawler extends \core\task\scheduled_task {
             if ($task = $DB->get_record('transcoder_tasks', array('fileid' => $file->id))) {
                 continue;
             }
-            $this->log("Candidate file found → $file->filename", 1);
+            $this->log("Candidate file found → $file->id ($file->filename)", 1);
 
             $this->log("Searching for content references to $file->filename", 2);
-            list($pages, $labels) = find_filename_in_content($file);
+            $results = find_filename_in_content($file);
+            $found = array_filter($results);
 
             // If this video is not referenced anywhere, no need to transcode it.
-            if (empty($pages) && empty($labels)) {
+            if (empty($found)) {
                 $this->log("Skipping as file was not referenced in any content.", 2);
                 continue;
             }
