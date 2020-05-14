@@ -52,7 +52,7 @@ class crawler extends \core\task\scheduled_task {
         $this->log_start("Starting crawler task.");
 
         // Check required settings.
-        if (check_required_fields()) {
+        if (!check_required_fields()) {
             $this->log_finish("Error → Missing required settings. See README.");
             return;
         }
@@ -87,7 +87,7 @@ class crawler extends \core\task\scheduled_task {
             $this->log("Candidate file found → $file->id ($file->filename)", 1);
 
             $this->log("Searching for content references to $file->filename", 2);
-            $results = array_filter(find_filename_in_content($file));
+            $results = array_filter(find_filename_in_content($file, $this->get_trace()));
 
             // If this video is not referenced anywhere, no need to transcode it.
             if (empty($results)) {

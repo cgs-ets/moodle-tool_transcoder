@@ -57,7 +57,7 @@ class transcoder extends \core\task\adhoc_task {
         $this->log_start("Starting transcode task.");
 
         // Check required settings.
-        if (check_required_fields()) {
+        if (!check_required_fields()) {
             $this->log_finish("Error → Missing required settings. See README.");
             return;
         }
@@ -181,7 +181,7 @@ class transcoder extends \core\task\adhoc_task {
 
         // Update the HTML references to the file.
         $this->log('Searching for HTML references to update.', 1);
-        $found = array_filter(find_filename_in_content($file));
+        $found = array_filter(find_filename_in_content($file, $this->get_trace()));
         foreach ($found as $tablecol => $entries) {
             $table = explode('__', $tablecol)[1];
             $col = explode('__', $tablecol)[2];

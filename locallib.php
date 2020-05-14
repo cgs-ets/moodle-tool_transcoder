@@ -39,9 +39,10 @@ define('TRANSCODER_STATUS_FAILED', 3);
  * Searches HTML content for references to a file.
  *
  * @param stdClass $file The file record to search for.
+ * @param progress_trace $trace The trace to use to log messages.
  * @param array Array of records with matches.
  */
-function find_filename_in_content($file) {
+function find_filename_in_content($file, $trace) {
     $config = get_config('tool_transcoder');
     $searchareas = explode(',', $config->contentareas);
 
@@ -54,9 +55,9 @@ function find_filename_in_content($file) {
         if ($component != $file->component) {
             continue;
         }
-
         $table = explode('__', $contentarea)[1];
         $col = explode('__', $contentarea)[2];
+        $trace->log("Looking for uses within component $component, table $table, col $col.", 2);
         $key = $component . '__' .$table . '__' . $col;
         $matches[$key] = find_filename_in_table_col($file, $table, $col);
     }

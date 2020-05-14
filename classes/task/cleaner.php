@@ -51,7 +51,7 @@ class cleaner extends \core\task\scheduled_task {
         $this->log_start("Starting cleaner task.");
 
         // Check required settings.
-        if (check_required_fields()) {
+        if (!check_required_fields()) {
             $this->log_finish("Error → Missing required settings. See README.");
             return;
         }
@@ -111,8 +111,8 @@ class cleaner extends \core\task\scheduled_task {
             }
 
             // Find content references to the files.
-            $found1 = array_filter(find_filename_in_content($file));
-            $found2 = array_filter(find_filename_in_content($newfile));
+            $found1 = array_filter(find_filename_in_content($file, $this->get_trace()));
+            $found2 = array_filter(find_filename_in_content($newfile, $this->get_trace()));
 
             // Check whether there are any references to the original and transcoded files.
             if (empty($found1) && empty($found2)) {
