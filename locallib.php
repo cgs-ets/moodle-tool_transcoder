@@ -57,7 +57,7 @@ function find_filename_in_content($file, $trace) {
         }
         $table = explode('__', $contentarea)[1];
         $col = explode('__', $contentarea)[2];
-        $trace->log("Looking for uses within component $component, table $table, col $col.", 2);
+        $trace->output("Looking for uses within component $component, table $table, col $col.", 2);
         $key = $component . '__' .$table . '__' . $col;
         $matches[$key] = find_filename_in_table_col($file, $table, $col);
     }
