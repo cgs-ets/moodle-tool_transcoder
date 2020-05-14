@@ -48,9 +48,16 @@ class cleaner extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        $config = get_config('tool_transcoder');
-
         $this->log_start("Starting cleaner task.");
+
+        // Check required settings.
+        if (check_required_fields()) {
+            $this->log_finish("Error → Missing required settings. See README.");
+            return;
+        }
+
+        // Load the settings.
+        $config = get_config('tool_transcoder');
 
         // Look for tasks that have been in-progress for more than 24 hours. These are likely failed conversions.
         $this->log("Cleaning old in-progress tasks.", 1);
@@ -66,7 +73,7 @@ class cleaner extends \core\task\scheduled_task {
         $params[] = TRANSCODER_STATUS_FAILED;
         $params[] = TRANSCODER_STATUS_INPROGRESS;
         $params[] = $expiry;
-        $params[] = TRANSCODER_MAX_RETRIES;
+        $params[] = $config->retries;
         $DB->execute($sql, $params);
 
         // Retry up to 3 times.
@@ -80,7 +87,7 @@ class cleaner extends \core\task\scheduled_task {
         $params[] = TRANSCODER_STATUS_READY;
         $params[] = TRANSCODER_STATUS_INPROGRESS;
         $params[] = $expiry;
-        $params[] = TRANSCODER_MAX_RETRIES;
+        $params[] = $config->retries;
         $DB->execute($sql, $params);
 
         // Check references to transcoded files still exist.

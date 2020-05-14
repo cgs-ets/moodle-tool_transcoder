@@ -54,22 +54,16 @@ class transcoder extends \core\task\adhoc_task {
     public function execute() {
         global $DB, $CFG;
 
-        $this->config = get_config('tool_transcoder');
+        $this->log_start("Starting transcode task.");
 
         // Check required settings.
-        if (empty($this->config->concurrencylimit) ||
-            empty($this->config->ffmpegbinary) ||
-            empty($this->config->ffprobebinary) ||
-            empty($this->config->ffmpegtimeout) ||
-            empty($this->config->ffmpegthreads) ||
-            empty($this->config->ffmpegaudiocodec) ||
-            empty($this->config->ffmpegaudiokilobitrate) ||
-            empty($this->config->ffmpegaudiochannels) ||
-            empty($this->config->processexpiry)
-        ) {
-                $this->log_start("Error → Missing required settings. See README.");
-                return;
+        if (check_required_fields()) {
+            $this->log_finish("Error → Missing required settings. See README.");
+            return;
         }
+
+        // Load the settings.
+        $this->config = get_config('tool_transcoder');
 
         // Check whether we are using Moodle's cron system and transcoding a specific adhoc task
         // or whether we are running this from cli and transcoding the next in line.
@@ -78,7 +72,7 @@ class transcoder extends \core\task\adhoc_task {
             // Check concurrency limit.
             $count = $DB->count_records('transcoder_tasks', array('status' => TRANSCODER_STATUS_INPROGRESS));
             if ($count >= $this->config->concurrencylimit) {
-                $this->log_start("Exiting → $count transcoding task(s) currently in-progress. Concurrency limit is $this->config->concurrencylimit.");
+                $this->log_finish("Exiting → $count transcoding task(s) currently in-progress. Concurrency limit is $this->config->concurrencylimit.");
                 return;
             }
             $sql = "SELECT id
@@ -90,24 +84,24 @@ class transcoder extends \core\task\adhoc_task {
 
         // Check if there is a task id to process.
         if (empty($taskid)) {
-            $this->log_start('Exiting → No tasks to process. If you are running this from cli, ensure that the disablecron setting is selected.');
+            $this->log_finish('Exiting → No tasks to process. If you are running this from cli, ensure that the disablecron setting is selected.');
             return;
         }
 
         // Load the task details.
         $task = $DB->get_record('transcoder_tasks', array('id' => $taskid));
         if (empty($task)) {
-            $this->log_start("Exiting → Failed to find transcoder task record $taskid.");
+            $this->log_finish("Exiting → Failed to find transcoder task record $taskid.");
             return;
         }
 
         // Double check the status as this could have been called from cron and cli.
         if ($task->status == TRANSCODER_STATUS_INPROGRESS) {
-            $this->log_start("Exiting → Task $taskid is already in-progress.");
+            $this->log_finish("Exiting → Task $taskid is already in-progress.");
             return;
         }
         if ($task->status == TRANSCODER_STATUS_COMPLETED) {
-            $this->log_start("Exiting → Task $taskid is already completed.");
+            $this->log_finish("Exiting → Task $taskid is already completed.");
             return;
         }
 
@@ -119,7 +113,7 @@ class transcoder extends \core\task\adhoc_task {
         // Load the file record.
         $file = $DB->get_record('files', array('id' => $task->fileid));
         if (empty($file)) {
-            $this->log_start("Exiting → Failed to find file record $task->fileid");
+            $this->log_finish("Exiting → Failed to find file record $task->fileid");
             return;
         }
 
@@ -134,7 +128,7 @@ class transcoder extends \core\task\adhoc_task {
                     '\\' . substr($file->contenthash, 2, 2) . 
                     '\\';
         $physicalpath = $dir . $file->contenthash;
-        $this->log_start("Starting transcode task for $file->filename → $physicalpath");
+        $this->log_start("Transcoding $file->filename → $physicalpath");
 
         // Transcode the file.
         $htmltag = 'video';

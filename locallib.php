@@ -34,8 +34,6 @@ define('TRANSCODER_STATUS_READY', 0);
 define('TRANSCODER_STATUS_INPROGRESS', 1);
 define('TRANSCODER_STATUS_COMPLETED', 2);
 define('TRANSCODER_STATUS_FAILED', 3);
-define('TRANSCODER_MAX_RETRIES', 3);
-
 
 /**
  * Searches HTML content for references to a file.
@@ -223,4 +221,26 @@ function transcode_audio_using_ffmpeg($dir, $filename, $newphysicalname) {
 
     // Save the video in the same directory with the new format.
     $audio->save($format, $dir . $newphysicalname);
+}
+
+function check_required_fields() {
+    $config = get_config('tool_transcoder');
+
+    if (empty($config->concurrencylimit) ||
+        empty($config->ffmpegbinary) ||
+        empty($config->ffprobebinary) ||
+        empty($config->ffmpegtimeout) ||
+        empty($config->ffmpegthreads) ||
+        empty($config->ffmpegaudiocodec) ||
+        empty($config->ffmpegaudiokilobitrate) ||
+        empty($config->ffmpegaudiochannels) ||
+        empty($config->mimetypes) ||
+        empty($config->contentareas) ||
+        empty($config->processexpiry) ||
+        empty($config->retries)
+    ) {
+        return false;
+    }
+
+    return true;
 }

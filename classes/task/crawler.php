@@ -49,25 +49,16 @@ class crawler extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        $config = get_config('tool_transcoder');
+        $this->log_start("Starting crawler task.");
 
         // Check required settings.
-        if (empty($config->concurrencylimit) ||
-            empty($config->ffmpegbinary) ||
-            empty($config->ffprobebinary) ||
-            empty($config->ffmpegtimeout) ||
-            empty($config->ffmpegthreads) ||
-            empty($config->ffmpegaudiocodec) ||
-            empty($config->ffmpegaudiokilobitrate) ||
-            empty($config->ffmpegaudiochannels) ||
-            empty($config->mimetypes) ||
-            empty($config->contentareas)
-        ) {
-                $this->log_start("Error → Missing required settings. See README.");
-                return;
+        if (check_required_fields()) {
+            $this->log_finish("Error → Missing required settings. See README.");
+            return;
         }
 
-        $this->log_start("Starting crawler task.");
+        // Load the settings.
+        $config = get_config('tool_transcoder');
 
         // Look for video and audio files.
         $mimetypes = explode(',', $config->mimetypes);
