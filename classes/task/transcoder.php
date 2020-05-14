@@ -187,8 +187,8 @@ class transcoder extends \core\task\adhoc_task {
         $this->log('Searching for HTML references to update.', 1);
         $found = array_filter(find_filename_in_content($file));
         foreach ($found as $tablecol => $entries) {
-            $table = explode('__', $tablecol)[0];
-            $col = explode('__', $tablecol)[1];
+            $table = explode('__', $tablecol)[1];
+            $col = explode('__', $tablecol)[2];
             $this->log("Adding transcoded source $task->newfileid into $table entries " . json_encode(array_keys($entries)), 1);
             update_html_source($this->get_trace(), $file, $newfile, $entries, $table, $col, $htmltag);
         }

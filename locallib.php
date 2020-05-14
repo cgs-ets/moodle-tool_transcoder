@@ -45,10 +45,10 @@ define('TRANSCODER_MAX_RETRIES', 3);
  */
 function find_filename_in_content($file) {
     $config = get_config('tool_transcoder');
-    $contentareas = explode(',', $config->contentareas);
+    $searchareas = explode(',', $config->contentareas);
 
     $matches = array();
-    foreach ($contentareas as $contentarea) {
+    foreach ($searchareas as $contentarea) {
         $component = explode('__', $contentarea)[0];
         // Only look at in the content area that the original file was added to. If the file has 
         // been copied to another area a separate file record will exist for it and it will be
@@ -84,11 +84,11 @@ function find_filename_in_table_col($file, $table, $col) {
  * @param stdClass $file The original file record.
  * @param stdClass $newfile The new file record.
  * @param array $entries Content records such as pages and labels.
- * @param array $mod The mod, e.g. page.
+ * @param array $table The mod table, e.g. page.
  * @param array $htmlcol The name of the column containing the html content to modify.
  * @param array $htmltag The type of tag (e.g. video/audio) that needs to be modified.
  */
-function update_html_source($trace, $file, $newfile, $entries, $mod, $htmlcol, $htmltag) {
+function update_html_source($trace, $file, $newfile, $entries, $table, $htmlcol, $htmltag) {
     global $DB, $CFG;
 
     // Look for current references to this file in entry content.
@@ -132,25 +132,25 @@ function update_html_source($trace, $file, $newfile, $entries, $mod, $htmlcol, $
 
                 // Update the entry content with the new html.
                 $entry->$htmlcol = $dom->outerHtml;
-                $DB->update_record($mod, $entry);
+                $DB->update_record($table, $entry);
 
                 // Get the course id.
                 $courseid = 0;
                 if (isset($entry->course)) {
                     $courseid = $entry->course;
                 }
-                if ($mod == 'course') {
+                if ($table == 'course') {
                     $courseid = $entry->id;
                 }
 
                 // Attempt to log a URL to the content for convenience.
-                $moduleid = $DB->get_field('modules', 'id', array('name' => $mod));
+                $moduleid = $DB->get_field('modules', 'id', array('name' => $table));
                 if ($moduleid && $courseid) {
                     $coursemoduleid = $DB->get_field('course_modules', 'id', array('course' => $entry->course, 'instance' => $entry->id, 'module' => $moduleid));
-                    $entryurl = $CFG->wwwroot . '/mod/' . $mod . '/view.php?id=' . $coursemoduleid;
-                    $trace->output("Updated html for $mod entry $entry->id `$entry->name` → $entryurl", 2);
+                    $entryurl = $CFG->wwwroot . '/mod/' . $table . '/view.php?id=' . $coursemoduleid;
+                    $trace->output("Updated html for $table entry $entry->id `$entry->name` → $entryurl", 2);
                 } else {
-                    $trace->output("Updated html for $mod entry $entry->id", 2);
+                    $trace->output("Updated html for $table entry $entry->id", 2);
                 }
 
                 // Attempt to rebuild course cache so that new sources are displayed. https://moodle.org/mod/forum/discuss.php?d=191773.
