@@ -57,3 +57,5 @@ $string['processexpiry'] = 'Transcoding time limit';
 $string['processexpiry_desc'] = 'The number of minutes to allow an in-progress transcoding task to run before it is retried. Set this value high enough to give files enough time to transcode. This will depend on your length, upload and concurrency limits, as well as how well your server is resourced. At the same time, try to keep this value is low as possible so that multiple failed in-progress tasks do not block new tasks due to the concurrency limit. (Required)';
 $string['retries'] = 'Retries';
 $string['retries_desc'] = 'The number of times to retry failed transcoding tasks. (Required)';
+$string['filesfromtime'] = 'Files From time';
+$string['filesfromtime_desc'] = 'Files created after this time (unix timestamp) will be crawled.';

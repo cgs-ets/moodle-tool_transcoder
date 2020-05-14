@@ -132,4 +132,8 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext('tool_transcoder/retries',
         get_string('retries', 'tool_transcoder'),
         get_string('retries_desc', 'tool_transcoder'), 2, PARAM_INT));
+
+    $settings->add(new admin_setting_configtext('tool_transcoder/filesfromtime',
+        get_string('filesfromtime', 'tool_transcoder'),
+        get_string('filesfromtime_desc', 'tool_transcoder'), 0, PARAM_INT));
 }

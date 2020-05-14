@@ -60,6 +60,9 @@ class crawler extends \core\task\scheduled_task {
         // Load the settings.
         $config = get_config('tool_transcoder');
 
+        $timefrom = $config->filesfromtime ? $config->filesfromtime : 0;
+        $this->log("Looking for files created after $timefrom (unix timestamp).", 1);
+
         // Look for video and audio files.
         $mimetypes = explode(',', $config->mimetypes);
         list($mimesql, $mimeparams) = $DB->get_in_or_equal($mimetypes);
@@ -76,8 +79,10 @@ class crawler extends \core\task\scheduled_task {
                 FROM {files}
                 WHERE (mimetype $mimesql)
                 AND ($componentsql)
+                AND timecreated > ?
                 ORDER BY id ASC";
         $params = array_merge($mimeparams, $componentparams);
+        $params[] = $timefrom;
         $files = $DB->get_records_sql($sql, $params);
         foreach ($files as $file) {
             // Skip if a task for this video has already been created.

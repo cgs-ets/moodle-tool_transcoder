@@ -40,6 +40,7 @@ An admin tool that automatically crawls Moodle's file store for video and audio 
  - `mimetypes` → (Required) The formats to detect and transcode. (Default: video/webm, audio/ogg)
  - `processexpiry` → (Required) The number of minutes to allow an in-progress transcoding task to run before it is retried. Set this value high enough to give files enough time to transcode. This will depend on your length, upload and concurrency limits, as well as how well your server is resourced. At the same time, try to keep this value is low as possible so that multiple failed in-progress tasks do not block new tasks due to the concurrency limit. (Default: 30)
  - `retries` → (Required) The number of times to retry failed transcoding tasks. (Default: 2)
+ - `filesfromtime` → Files created after this time (unix timestamp) will be crawled. (Default: 0)
 
 ## Development
 Uses Composer package manager for library dependencies, however the vendor folder has been added to this repository to allow for simple installation.

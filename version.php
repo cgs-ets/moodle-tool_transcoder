@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020051304;
+$plugin->version   = 2020051305;
 $plugin->requires  = 2017111300;
 $plugin->component = 'tool_transcoder';
 $plugin->maturity = MATURITY_STABLE;
