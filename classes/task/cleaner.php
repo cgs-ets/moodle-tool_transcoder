@@ -120,8 +120,8 @@ class cleaner extends \core\task\scheduled_task {
                 if (isset($found2[$tablecol])) {
                     $ids = array_diff(array_keys($entries), array_keys($found2[$tablecol]));
                     if ($ids) {
-                        $table = explode('__', $tablecol)[0];
-                        $col = explode('__', $tablecol)[1];
+                        $table = explode('__', $tablecol)[1];
+                        $col = explode('__', $tablecol)[2];
                         $entries = array_filter($entries, function ($key) use ($ids) { return in_array($key, $ids); }, ARRAY_FILTER_USE_KEY );
                         $this->log("Transcoded file $task->newfileid was missing in $table entries " . json_encode($ids) . ", adding back in.", 1);
                         update_html_source($this->get_trace(), $file, $newfile, $entries, $table, $col, $htmltag);

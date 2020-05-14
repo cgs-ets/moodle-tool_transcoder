@@ -99,20 +99,20 @@ if ($hassiteconfig) {
     $visiblename = get_string('contentareas', 'tool_transcoder');
     $description = get_string('contentareas_desc', 'tool_transcoder');
     $defaultsetting = $choices = array(
-        'assign__intro' => 'Assignment Description',
-        'book__intro' => 'Book Introduction',
-        'book_chapters__content' => 'Book Chapter',
-        'course__summary' => 'Course Summary',
-        'folder__intro' => 'Folder Introduction',
-        'forum__intro' => 'Forum Introduction',
-        'label__intro' => 'Label Content',
-        'page__intro' => 'Page Introduction',
-        'page__content' => 'Page Content',
-        'question__questiontext' => 'Quiz Questions',
-        'quiz__intro' => 'Quiz Introduction',
-        'url__intro' => 'URL Introduction',
-        'wiki__intro' => 'Wiki Introduction',
-        'wiki_pages__cachedcontent' => 'Wiki Pages'
+        'mod_assign__assign__intro' => 'Assignment Description',
+        'mod_book__book__intro' => 'Book Introduction',
+        'mod_book__book_chapters__content' => 'Book Chapter',
+        'course__course__summary' => 'Course Summary',
+        'mod_folder__folder__intro' => 'Folder Introduction',
+        'mod_forum__forum__intro' => 'Forum Introduction',
+        'mod_label__label__intro' => 'Label Content',
+        'mod_page__page__intro' => 'Page Introduction',
+        'mod_page__page__content' => 'Page Content',
+        'question__question__questiontext' => 'Quiz Questions',
+        'mod_quiz__quiz__intro' => 'Quiz Introduction',
+        'mod_url__url__intro' => 'URL Introduction',
+        'mod_wiki__wiki__intro' => 'Wiki Introduction',
+        'mod_wiki__wiki_pages__cachedcontent' => 'Wiki Pages'
     );
     $contentareas = new admin_setting_configmulticheckbox($name, $visiblename, $description, $defaultsetting, $choices);
     $settings->add($contentareas);
