@@ -124,4 +124,8 @@ if ($hassiteconfig) {
     $defaultsetting = $choices = array('video/webm' => 'video/webm', 'audio/ogg' => 'audio/ogg');
     $transcodeformats = new admin_setting_configmulticheckbox($name, $visiblename, $description, $defaultsetting, $choices);
     $settings->add($transcodeformats);
+
+    $settings->add(new admin_setting_configtext('tool_transcoder/processexpiry',
+        get_string('processexpiry', 'tool_transcoder'),
+        get_string('processexpiry_desc', 'tool_transcoder'), 30, PARAM_INT));
 }

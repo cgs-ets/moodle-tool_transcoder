@@ -53,4 +53,5 @@ $string['contentareas'] = 'Search areas';
 $string['contentareas_desc'] = 'The activity types and fields to crawl. (Required)';
 $string['mimetypes'] = 'MIME types';
 $string['mimetypes_desc'] = 'The formats to detect and transcode. (Required)';
-
+$string['processexpiry'] = 'Transcoding time limit';
+$string['processexpiry_desc'] = 'The number of minutes to allow an in-progress transcoding task to run before it is retried. Set this value high enough to give files enough time to transcode. This will depend on your length, upload and concurrency limits, as well as how well your server is resourced. At the same time, try to keep this value is low as possible so that multiple failed in-progress tasks do not block new tasks due to the concurrency limit. (Required)';

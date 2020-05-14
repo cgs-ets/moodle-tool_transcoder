@@ -54,7 +54,7 @@ class cleaner extends \core\task\scheduled_task {
 
         // Look for tasks that have been in-progress for more than 24 hours. These are likely failed conversions.
         $this->log("Cleaning old in-progress tasks.", 1);
-        $yesterday = strtotime('-1 day');
+        $expiry = time() - $config->processexpiry * 60;
 
         // If retried 3 times just move to failed state.
         $sql = "UPDATE {transcoder_tasks} 
@@ -65,7 +65,7 @@ class cleaner extends \core\task\scheduled_task {
         $params = array();
         $params[] = TRANSCODER_STATUS_FAILED;
         $params[] = TRANSCODER_STATUS_INPROGRESS;
-        $params[] = $yesterday;
+        $params[] = $expiry;
         $params[] = TRANSCODER_MAX_RETRIES;
         $DB->execute($sql, $params);
 
@@ -79,7 +79,7 @@ class cleaner extends \core\task\scheduled_task {
         $params = array();
         $params[] = TRANSCODER_STATUS_READY;
         $params[] = TRANSCODER_STATUS_INPROGRESS;
-        $params[] = $yesterday;
+        $params[] = $expiry;
         $params[] = TRANSCODER_MAX_RETRIES;
         $DB->execute($sql, $params);
 

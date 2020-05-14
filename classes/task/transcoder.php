@@ -64,7 +64,9 @@ class transcoder extends \core\task\adhoc_task {
             empty($this->config->ffmpegthreads) ||
             empty($this->config->ffmpegaudiocodec) ||
             empty($this->config->ffmpegaudiokilobitrate) ||
-            empty($this->config->ffmpegaudiochannels) ) {
+            empty($this->config->ffmpegaudiochannels) ||
+            empty($this->config->processexpiry)
+        ) {
                 $this->log_start("Error → Missing required settings. See README.");
                 return;
         }
