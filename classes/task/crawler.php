@@ -59,24 +59,35 @@ class crawler extends \core\task\scheduled_task {
             empty($config->ffmpegthreads) ||
             empty($config->ffmpegaudiocodec) ||
             empty($config->ffmpegaudiokilobitrate) ||
-            empty($config->ffmpegaudiochannels) ) {
+            empty($config->ffmpegaudiochannels) ||
+            empty($config->mimetypes) ||
+            empty($config->contentareas)
+        ) {
                 $this->log_start("Error → Missing required settings. See README.");
                 return;
         }
 
         $this->log_start("Starting crawler task.");
 
-        // Look for video and audio files in page content.
+        // Look for video and audio files.
+        $mimetypes = explode(',', $config->mimetypes);
+        list($mimesql, $mimeparams) = $DB->get_in_or_equal($mimetypes);
+        // Limit file search to components with HTML fields we'll be checking.
+        $components = array('mod_assign', 'mod_book', 'mod_course', 'mod_folder','mod_forum', 'mod_label', 'mod_page', 'mod_question', 'mod_quiz', 'mod_url', 'mod_wiki');
+        $componentsqlarr = array();
+        $componentparams = array();
+        foreach ($components as $component) {
+            $componentsqlarr[] = 'component = ?';
+            $componentparams[] = $component;
+        }
+        $componentsql = implode(' OR ', $componentsqlarr);
         $sql = "SELECT *
                 FROM {files}
-                WHERE (
-                    mimetype = 'video/webm' OR
-                    mimetype = 'audio/ogg'
-                ) AND (
-                    (component = 'mod_page' AND filearea = 'content') OR 
-                    (component = 'mod_label' AND filearea = 'intro')
-                ) ORDER BY id ASC";
-        $files = $DB->get_records_sql($sql);
+                WHERE (mimetype $mimesql)
+                AND ($componentsql)
+                ORDER BY id ASC";
+        $params = array_merge($mimeparams, $componentparams);
+        $files = $DB->get_records_sql($sql, $params);
         foreach ($files as $file) {
             // Skip if a task for this video has already been created.
             if ($task = $DB->get_record('transcoder_tasks', array('fileid' => $file->id))) {
@@ -85,11 +96,10 @@ class crawler extends \core\task\scheduled_task {
             $this->log("Candidate file found → $file->id ($file->filename)", 1);
 
             $this->log("Searching for content references to $file->filename", 2);
-            $results = find_filename_in_content($file);
-            $found = array_filter($results);
+            $results = array_filter(find_filename_in_content($file));
 
             // If this video is not referenced anywhere, no need to transcode it.
-            if (empty($found)) {
+            if (empty($results)) {
                 $this->log("Skipping as file was not referenced in any content.", 2);
                 continue;
             }

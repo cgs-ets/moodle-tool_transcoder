@@ -36,6 +36,8 @@ An admin tool that automatically crawls Moodle's file store for video and audio 
  - `ffmpegadditionalparamsaudio` → You can specify additional parameters to be added to audio encoding tasks. This must be entered in valid json format, e.g. `{"-vf": "scale=-1:720", "-r": "30", "-vprofile": "main", "-level": "3.1", "-b:a": "160k", "-ar": "48000", "-ac": "2", "-movflags": "+faststart"}`
  - `ffmpegaudiokilobitrate` → (Required) The bitrate in kilobytes to be used for audio encoding tasks. (Default: 48000)
  - `ffmpegaudiochannels` → (Required) The number of channels to be used for audio encoding tasks. (Default: 2)
+ - `contentareas` → (Required) The activity types and fields to look into when looking for references to video/audio files. (Default: all)
+ - `mimetypes` → (Required) The formats to detect and transcode. (Default: video/webm, audio/ogg)
 
 ## Development
 Uses Composer package manager for library dependencies, however the vendor folder has been added to this repository to allow for simple installation.

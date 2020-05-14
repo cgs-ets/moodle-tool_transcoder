@@ -77,4 +77,51 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext('tool_transcoder/ffmpegaudiochannels',
         get_string('ffmpegaudiochannels', 'tool_transcoder'),
         get_string('ffmpegaudiochannels_desc', 'tool_transcoder'), 2, PARAM_INT));
+
+    /*
+     * Tables with HTML fields to check:
+     *   assign, intro = Assignment Description
+     *   book, intro = Book Introduction
+     *   book_chapters, content = Book Chapter
+     *   course, summary = Course Summary
+     *   folder, intro = Folder Introduction
+     *   forum, intro = Forum Introduction
+     *   label, intro = Label Content
+     *   page, intro = Page Introduction
+     *   page, content = Page Content
+     *   question, questiontext = Quiz Questions
+     *   quiz, intro = Quiz Introduction
+     *   url, intro = URL Introduction
+     *   wiki, intro = Wiki Introduction
+     *   wiki_pages, cachedcontent = Wiki Pages
+     */
+    $name = 'tool_transcoder/contentareas';
+    $visiblename = get_string('contentareas', 'tool_transcoder');
+    $description = get_string('contentareas_desc', 'tool_transcoder');
+    $defaultsetting = $choices = array(
+        'assign__intro' => 'Assignment Description',
+        'book__intro' => 'Book Introduction',
+        'book_chapters__content' => 'Book Chapter',
+        'course__summary' => 'Course Summary',
+        'folder__intro' => 'Folder Introduction',
+        'forum__intro' => 'Forum Introduction',
+        'label__intro' => 'Label Content',
+        'page__intro' => 'Page Introduction',
+        'page__content' => 'Page Content',
+        'question__questiontext' => 'Quiz Questions',
+        'quiz__intro' => 'Quiz Introduction',
+        'url__intro' => 'URL Introduction',
+        'wiki__intro' => 'Wiki Introduction',
+        'wiki_pages__cachedcontent' => 'Wiki Pages'
+    );
+    $contentareas = new admin_setting_configmulticheckbox($name, $visiblename, $description, $defaultsetting, $choices);
+    $settings->add($contentareas);
+
+    // Transcode mime types.
+    $name = 'tool_transcoder/mimetypes';
+    $visiblename = get_string('mimetypes', 'tool_transcoder');
+    $description = get_string('mimetypes_desc', 'tool_transcoder');
+    $defaultsetting = $choices = array('video/webm' => 'video/webm', 'audio/ogg' => 'audio/ogg');
+    $transcodeformats = new admin_setting_configmulticheckbox($name, $visiblename, $description, $defaultsetting, $choices);
+    $settings->add($transcodeformats);
 }

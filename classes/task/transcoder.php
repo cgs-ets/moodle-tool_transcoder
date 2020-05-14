@@ -184,12 +184,16 @@ class transcoder extends \core\task\adhoc_task {
         $DB->update_record('transcoder_tasks', $task);
 
         // Update the HTML references to the file.
-        $this->log('Updating HTML references to the file to include transcoded format.', 1);
-        list($pages, $labels) = find_filename_in_content($file);
-        update_html_source($this->get_trace(), $file, $newfile, $pages, 'page', 'content', $htmltag);
-        update_html_source($this->get_trace(), $file, $newfile, $labels, 'label', 'intro', $htmltag);
+        $this->log('Searching for HTML references to update.', 1);
+        $found = array_filter(find_filename_in_content($file));
+        foreach ($found as $tablecol => $entries) {
+            $table = explode('__', $tablecol)[0];
+            $col = explode('__', $tablecol)[1];
+            $this->log("Adding transcoded source $task->newfileid into $table entries " . json_encode(array_keys($entries)), 1);
+            update_html_source($this->get_trace(), $file, $newfile, $entries, $table, $col, $htmltag);
+        }
 
-        $task->status = TRANSCODER_STATUS_COMPLETED; // Complete.
+        $task->status = TRANSCODER_STATUS_COMPLETED;
         $task->timefinished = time();
         $DB->update_record('transcoder_tasks', $task);
 

@@ -115,15 +115,16 @@ class cleaner extends \core\task\scheduled_task {
             }
 
             // If the transcoded file is not referenced where the original file is, pop a reference into the html.
-            foreach ($found1 as $modcol => $entries) {
-                if (isset($found2[$modcol])) {
-                    $ids = array_diff(array_keys($entries), array_keys($found2[$modcol]));
+            $htmltag = explode('/', $file->mimetype)[0];
+            foreach ($found1 as $tablecol => $entries) {
+                if (isset($found2[$tablecol])) {
+                    $ids = array_diff(array_keys($entries), array_keys($found2[$tablecol]));
                     if ($ids) {
-                        $mod = explode('_', $modcol)[0];
-                        $col = explode('_', $modcol)[1];
+                        $table = explode('__', $tablecol)[0];
+                        $col = explode('__', $tablecol)[1];
                         $entries = array_filter($entries, function ($key) use ($ids) { return in_array($key, $ids); }, ARRAY_FILTER_USE_KEY );
-                        $this->log("Transcoded file $task->newfileid was missing in $mod entries " . json_encode($ids) . ", adding back in.", 1);
-                        update_html_video($this->get_trace(), $file, $newfile, $entries, $mod, $col);
+                        $this->log("Transcoded file $task->newfileid was missing in $table entries " . json_encode($ids) . ", adding back in.", 1);
+                        update_html_source($this->get_trace(), $file, $newfile, $entries, $table, $col, $htmltag);
                     }
                 }
             }

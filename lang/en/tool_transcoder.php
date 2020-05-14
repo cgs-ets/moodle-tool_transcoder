@@ -49,3 +49,8 @@ $string['ffmpegaudiokilobitrate'] = 'FFMpeg audio kilo bitrate';
 $string['ffmpegaudiokilobitrate_desc'] = 'The bitrate in kilobytes to be used for audio encoding tasks. (Required)';
 $string['ffmpegaudiochannels'] = 'FFMpeg audio channels';
 $string['ffmpegaudiochannels_desc'] = 'The number of channels to be used for audio encoding tasks. (Required)';
+$string['contentareas'] = 'Search areas';
+$string['contentareas_desc'] = 'The activity types and fields to crawl. (Required)';
+$string['mimetypes'] = 'MIME types';
+$string['mimetypes_desc'] = 'The formats to detect and transcode. (Required)';
+

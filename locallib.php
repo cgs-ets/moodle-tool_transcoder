@@ -39,75 +39,29 @@ define('TRANSCODER_MAX_RETRIES', 3);
 
 /**
  * Searches HTML content for references to a file.
- * Tables with HTML fields to check:
- *   assign, intro = Assignment Description
- *   book, intro = Book Introduction
- *   book_chapters, content = Book Chapter
- *   course, summary = Course Summary
- *   folder, intro = Folder Introduction
- *   forum, intro = Forum Introduction
- *   label, intro = Label Content
- *   page, intro = Page Introduction
- *   page, content = Page Content
- *   question, questiontext = Quiz Questions
- *   quiz, intro = Quiz Introduction
- *   url, intro = URL Introduction
- *   wiki, intro = Wiki Introduction
- *   wiki_pages, cachedcontent = Wiki Pages
  *
  * @param stdClass $file The file record to search for.
  * @param array Array of records with matches.
  */
 function find_filename_in_content($file) {
-    $modcols = array(
-        array('mod' => 'assign', 'col' => 'intro'),
-        array('mod' => 'book', 'col' => 'intro'),
-        array('mod' => 'book_chapters', 'col' => 'content'),
-        array('mod' => 'course', 'col' => 'summary'),
-        array('mod' => 'folder', 'col' => 'intro'),
-        array('mod' => 'forum', 'col' => 'intro'),
-        array('mod' => 'label', 'col' => 'intro'),
-        array('mod' => 'page', 'col' => 'intro'),
-        array('mod' => 'page', 'col' => 'content'),
-        array('mod' => 'question', 'col' => 'questiontext'),
-        array('mod' => 'quiz', 'col' => 'intro'),
-        array('mod' => 'url', 'col' => 'intro'),
-        array('mod' => 'wiki', 'col' => 'intro'),
-        array('mod' => 'wiki_pages', 'col' => 'cachedcontent'),
-    );
+    $config = get_config('tool_transcoder');
+    $contentareas = explode(',', $config->contentareas);
 
     $matches = array();
-    foreach ($modcols as $modcol) {
-        $mod = $modcol['mod'];
-        $col = $modcol['col'];
-        $key = $mod . '_' . $col;
-        $matches[$key] = find_filename_in_mod_col($file, $mod, $col);
+    foreach ($contentareas as $contentarea) {
+        $table = explode('__', $contentarea)[0];
+        $col = explode('__', $contentarea)[1];
+        $key = $table . '__' . $col;
+        $matches[$key] = find_filename_in_table_col($file, $table, $col);
     }
-
-    /*// Pages
-    $sql = 'SELECT * FROM {page} WHERE ' . $DB->sql_like('content', ':filename1') . ' OR ' . $DB->sql_like('intro', ':filename2');
-    $params = array(
-        'filename1' => '%' . $file->filename . '%'
-        'filename2' => '%' . $file->filename . '%'
-    );
-    $pages = $DB->get_records_sql($sql, $params);
-
-    // Labels
-    $sql = 'SELECT * FROM {label} WHERE ' . $DB->sql_like('intro', ':filename');
-    $params = array('filename' => '%' . $file->filename . '%');
-    $labels = $DB->get_records_sql($sql, $params);
-
-    return array($pages, $labels);*/
-
-    var_export($matches);
 
     return $matches;
 }
 
-function find_filename_in_mod_col($file, $mod, $col) {
+function find_filename_in_table_col($file, $table, $col) {
     global $DB;
 
-    $sql = "SELECT * FROM {{$mod}} WHERE " . $DB->sql_like($col, ':filename');
+    $sql = "SELECT * FROM {{$table}} WHERE " . $DB->sql_like($col, ':filename');
     $params = array('filename' => '%' . $file->filename . '%');
     $matches = $DB->get_records_sql($sql, $params);
 
@@ -122,7 +76,7 @@ function find_filename_in_mod_col($file, $mod, $col) {
  * @param stdClass $file The original file record.
  * @param stdClass $newfile The new file record.
  * @param array $entries Content records such as pages and labels.
- * @param array $mod The mod type, e.g. page.
+ * @param array $mod The mod, e.g. page.
  * @param array $htmlcol The name of the column containing the html content to modify.
  * @param array $htmltag The type of tag (e.g. video/audio) that needs to be modified.
  */
@@ -172,15 +126,31 @@ function update_html_source($trace, $file, $newfile, $entries, $mod, $htmlcol, $
                 $entry->$htmlcol = $dom->outerHtml;
                 $DB->update_record($mod, $entry);
 
-                // Log URL of content
-                $moduleid = $DB->get_field('modules', 'id', array('name' => $mod));
-                $coursemoduleid = $DB->get_field('course_modules', 'id', array('course' => $entry->course, 'instance' => $entry->id, 'module' => $moduleid));
-                $entryurl = $CFG->wwwroot . '/mod/' . $mod . '/view.php?id=' . $coursemoduleid;
-                $trace->output("Updated html for `$entry->name` → $entryurl", 2);
+                // Get the course id.
+                $courseid = 0;
+                if (isset($entry->course)) {
+                    $courseid = $entry->course;
+                }
+                if ($mod == 'course') {
+                    $courseid = $entry->id;
+                }
 
-                // Rebuild course cache so that new content is displayed. https://moodle.org/mod/forum/discuss.php?d=191773
-                $trace->output("Rebuilding cache for course $entry->course", 2);
-                rebuild_course_cache($entry->course, true);
+                // Attempt to log a URL to the content for convenience.
+                $moduleid = $DB->get_field('modules', 'id', array('name' => $mod));
+                if ($moduleid && $courseid) {
+                    $coursemoduleid = $DB->get_field('course_modules', 'id', array('course' => $entry->course, 'instance' => $entry->id, 'module' => $moduleid));
+                    $entryurl = $CFG->wwwroot . '/mod/' . $mod . '/view.php?id=' . $coursemoduleid;
+                    $trace->output("Updated html for $mod entry $entry->id `$entry->name` → $entryurl", 2);
+                } else {
+                    $trace->output("Updated html for $mod entry $entry->id", 2);
+                }
+
+                // Attempt to rebuild course cache so that new sources are displayed. https://moodle.org/mod/forum/discuss.php?d=191773.
+                if ($courseid) {
+                    $trace->output("Rebuilding cache for course $entry->course", 2);
+                    rebuild_course_cache($courseid, true);
+                }
+
             }
         }
     }
