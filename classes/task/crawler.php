@@ -28,6 +28,7 @@ namespace tool_transcoder\task;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/admin/tool/transcoder/locallib.php');
+require_once($CFG->dirroot . '/lib/adminlib.php');
 
 class crawler extends \core\task\scheduled_task {
 
@@ -83,6 +84,12 @@ class crawler extends \core\task\scheduled_task {
                 ORDER BY id ASC";
         $params = array_merge($mimeparams, $componentparams);
         $params[] = $timefrom;
+
+        // Update filesfromtime setting to now so that we only crawl new files.
+        // This is intentionally done before querying the file store to ensure no file is ever missed.
+        set_config('filesfromtime', time(), 'tool_transcoder');
+
+        // Crawl the file store.
         $files = $DB->get_records_sql($sql, $params);
         foreach ($files as $file) {
             // Skip if a task for this video has already been created.

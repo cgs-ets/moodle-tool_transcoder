@@ -58,4 +58,4 @@ $string['processexpiry_desc'] = 'The number of minutes to allow an in-progress t
 $string['retries'] = 'Retries';
 $string['retries_desc'] = 'The number of times to retry failed transcoding tasks. (Required)';
 $string['filesfromtime'] = 'Files From time';
-$string['filesfromtime_desc'] = 'Files created after this time (unix timestamp) will be crawled.';
+$string['filesfromtime_desc'] = 'Files created after this time (unix timestamp) will be crawled. This setting is automatically updated to the current time each time the crawler task runs so that only new files are crawled.';
