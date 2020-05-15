@@ -98,21 +98,24 @@ if ($hassiteconfig) {
     $name = 'tool_transcoder/contentareas';
     $visiblename = get_string('contentareas', 'tool_transcoder');
     $description = get_string('contentareas_desc', 'tool_transcoder');
+    //component__filearea__table__column
     $defaultsetting = $choices = array(
-        'mod_assign__assign__intro' => 'Assignment Description',
-        'mod_book__book__intro' => 'Book Introduction',
-        'mod_book__book_chapters__content' => 'Book Chapter',
-        'course__course__summary' => 'Course Summary',
-        'mod_folder__folder__intro' => 'Folder Introduction',
-        'mod_forum__forum__intro' => 'Forum Introduction',
-        'mod_label__label__intro' => 'Label Content',
-        'mod_page__page__intro' => 'Page Introduction',
-        'mod_page__page__content' => 'Page Content',
-        'question__question__questiontext' => 'Quiz Questions',
-        'mod_quiz__quiz__intro' => 'Quiz Introduction',
-        'mod_url__url__intro' => 'URL Introduction',
-        'mod_wiki__wiki__intro' => 'Wiki Introduction',
-        'mod_wiki__wiki_pages__cachedcontent' => 'Wiki Pages'
+        'mod_assign__intro__assign__intro' => 'Assignment Description',
+        'assignsubmission_onlinetext__submissions_onlinetext__assignsubmission_onlinetext__onlinetext' => 'Assignment Online Submission',
+        'mod_book__intro__book__intro' => 'Book Introduction',
+        'mod_book__content__book_chapters__content' => 'Book Chapter',
+        'course__summary__course__summary' => 'Course Summary',
+        'mod_folder__intro__folder__intro' => 'Folder Introduction',
+        'mod_forum__intro__forum__intro' => 'Forum Introduction',
+        'mod_forum__post__forum_posts__message' => 'Forum Post',
+        'mod_label__intro__label__intro' => 'Label Content',
+        'mod_page__intro__page__intro' => 'Page Introduction',
+        'mod_page__content__page__content' => 'Page Content',
+        'question__questiontext__question__questiontext' => 'Quiz Questions',
+        'mod_quiz__intro__quiz__intro' => 'Quiz Introduction',
+        'mod_url__intro__url__intro' => 'URL Introduction',
+        'mod_wiki__intro__wiki__intro' => 'Wiki Introduction',
+        'mod_wiki__cachedcontent__wiki_pages__cachedcontent' => 'Wiki Pages'
     );
     $contentareas = new admin_setting_configmulticheckbox($name, $visiblename, $description, $defaultsetting, $choices);
     $settings->add($contentareas);

@@ -49,17 +49,17 @@ function find_filename_in_content($file, $trace) {
     $matches = array();
     foreach ($searchareas as $contentarea) {
         $component = explode('__', $contentarea)[0];
-        $table = explode('__', $contentarea)[1];
-        $col = explode('__', $contentarea)[2];
+        $filearea = explode('__', $contentarea)[1];
+        $table = explode('__', $contentarea)[2];
+        $col = explode('__', $contentarea)[3];
         // Only look at in the content area that the original file was added to. If the file has 
         // been copied to another area a separate file record will exist for it and it will be
         // checked independently.
-        if ($file->component != $component || $file->filearea != $col) {
+        if ($file->component != $component || $file->filearea != $filearea) {
             continue;
         }
-        $trace->output("Looking for uses within component $component, table $table, col $col.", 2);
-        $key = $component . '__' .$table . '__' . $col;
-        $matches[$key] = find_filename_in_table_col($file, $table, $col);
+        $trace->output("Looking for uses within component $component, filearea $filearea, table $table, col $col.", 2);
+        $matches[$contentarea] = find_filename_in_table_col($file, $table, $col);
     }
 
     return $matches;

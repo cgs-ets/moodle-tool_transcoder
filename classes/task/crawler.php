@@ -67,12 +67,12 @@ class crawler extends \core\task\scheduled_task {
         $mimetypes = explode(',', $config->mimetypes);
         list($mimesql, $mimeparams) = $DB->get_in_or_equal($mimetypes);
         // Limit file search to components with HTML fields we'll be checking.
-        $components = array('mod_assign', 'mod_book', 'course', 'mod_folder','mod_forum', 'mod_label', 'mod_page', 'question', 'mod_quiz', 'mod_url', 'mod_wiki');
+        $searchareas = explode(',', $config->contentareas);
         $componentsqlarr = array();
         $componentparams = array();
-        foreach ($components as $component) {
+        foreach ($searchareas as $contentarea) {
             $componentsqlarr[] = 'component = ?';
-            $componentparams[] = $component;
+            $componentparams[] = explode('__', $contentarea)[0];
         }
         $componentsql = implode(' OR ', $componentsqlarr);
         $sql = "SELECT *

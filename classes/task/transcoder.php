@@ -34,12 +34,6 @@ class transcoder extends \core\task\adhoc_task {
     use \core\task\logging_trait;
 
     /**
-     * @var stdClass config for this plugin
-     */
-    protected $config;
-
-
-    /**
      * Get a descriptive name for this task (shown to admins).
      *
      * @return string
@@ -63,16 +57,16 @@ class transcoder extends \core\task\adhoc_task {
         }
 
         // Load the settings.
-        $this->config = get_config('tool_transcoder');
+        $config = get_config('tool_transcoder');
 
         // Check whether we are using Moodle's cron system and transcoding a specific adhoc task
         // or whether we are running this from cli and transcoding the next in line.
         $taskid = $this->get_custom_data();
-        if (empty($taskid) && $this->config->disablecron) {
+        if (empty($taskid) && $config->disablecron) {
             // Check concurrency limit.
             $count = $DB->count_records('transcoder_tasks', array('status' => TRANSCODER_STATUS_INPROGRESS));
-            if ($count >= $this->config->concurrencylimit) {
-                $this->log_finish("Exiting → $count transcoding task(s) currently in-progress. Concurrency limit is $this->config->concurrencylimit.");
+            if ($count >= $config->concurrencylimit) {
+                $this->log_finish("Exiting → $count transcoding task(s) currently in-progress. Concurrency limit is $config->concurrencylimit.");
                 return;
             }
             $sql = "SELECT id
@@ -183,8 +177,8 @@ class transcoder extends \core\task\adhoc_task {
         $this->log('Searching for HTML references to update.', 1);
         $found = array_filter(find_filename_in_content($file, $this->get_trace()));
         foreach ($found as $tablecol => $entries) {
-            $table = explode('__', $tablecol)[1];
-            $col = explode('__', $tablecol)[2];
+            $table = explode('__', $tablecol)[2];
+            $col = explode('__', $tablecol)[3];
             $this->log("Adding transcoded source $task->newfileid into $table entries " . json_encode(array_keys($entries)), 1);
             update_html_source($this->get_trace(), $file, $newfile, $entries, $table, $col, $htmltag);
         }
