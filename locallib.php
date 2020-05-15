@@ -16,7 +16,7 @@
 
 /**
  * @package   tool_transcoder
- * @copyright 2020 Michael Vangelovski <michael.vangelovski@gmail.com>
+ * @copyright 2020 Michael Vangelovski 
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -65,6 +65,14 @@ function find_filename_in_content($file, $trace) {
     return $matches;
 }
 
+/**
+ * Searches HTML content for references to a file.
+ *
+ * @param stdClass $file The file record to search for.
+ * @param string $table The table to search.
+ * @param string $col The table field to search.
+ * @param array Array of records with matches.
+ */
 function find_filename_in_table_col($file, $table, $col) {
     global $DB;
 
@@ -163,7 +171,14 @@ function update_html_source($trace, $file, $newfile, $entries, $table, $htmlcol,
     }
 }
 
-
+/**
+ * Transcodes a video file using ffmpeg and saves the new file in the same directory.
+ *
+ * @param string $dir Physical path of the file.
+ * @param string $filename Name of the file including file extension.
+ * @param string $newphysicalname The new filename of the file including file extension.
+ * @return void.
+ */
 function transcode_video_using_ffmpeg($dir, $filename, $newphysicalname) {
 	$config = get_config('tool_transcoder');
 
@@ -201,6 +216,14 @@ function transcode_video_using_ffmpeg($dir, $filename, $newphysicalname) {
 }
 
 
+/**
+ * Transcodes an audio file using ffmpeg and saves the new file in the same directory.
+ *
+ * @param string $dir Physical path of the file.
+ * @param string $filename Name of the file including file extension.
+ * @param string $newphysicalname The new filename of the file including file extension.
+ * @return void.
+ */
 function transcode_audio_using_ffmpeg($dir, $filename, $newphysicalname) {
 	$config = get_config('tool_transcoder');
 
@@ -224,7 +247,12 @@ function transcode_audio_using_ffmpeg($dir, $filename, $newphysicalname) {
     $audio->save($format, $dir . $newphysicalname);
 }
 
-function check_required_fields() {
+/**
+ * Checks whether the required plugin settings have been configured.
+ *
+ * @return bool. True if all settings are set, false if settings are missing.
+ */
+function has_required_settings() {
     $config = get_config('tool_transcoder');
 
     if (empty($config->concurrencylimit) ||

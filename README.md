@@ -1,5 +1,5 @@
 # Transcoder plugin for Moodle.
-An admin tool that automatically crawls Moodle's file store for video and audio files and transcodes them to mp4 and mp3 using FFmpeg. The HTML is automatically updated to include the transcoded files as an additional source for the video and audio html5 tags. The original formats are preserved as a source. This plugin was initially created to add cross browser compatibility (specifically Safari on Apple operating systems) for WebRTC based audio and video recordings using the Atto editor.
+An admin tool created to improve the browser compatibility of WebRTC based video and audio recordings. WebRTC recording is a feature of the Atto editor that allows users to record direct from their webcams and microphones. Behind the scenes, the file formats produced are webm for video and ogg for audio which do not have native support in Safari and iDevices. The transcoder plugin automatically crawls Moodle's file store and a number of content types (e.g. pages, forums, assignments, labels) for webm video and ogg audio files. It then uses FFmpeg to transcode them to H.264 AAC mp4 for video and mp3 for audio. The new file is stored with the original file, and the `video` or `audio` HTML5 tag within the activity HTML is automatically updated to include the transcoded file as an additional source. The original format is preserved as the first source. The default or example settings are optimised so that the transcoded files play natively within browsers on iDevices.
 
 ## Author
 [Michael Vangelovski](https://github.com/michaelvangelovski/)
@@ -30,7 +30,7 @@ An admin tool that automatically crawls Moodle's file store for video and audio 
  - `ffmpegbinary` → (Required) Path to the ffmpeg binary on the system, e.g. `C:/ffmpeg/bin/ffmpeg.exe`)
  - `ffprobebinary` → (Required) Path to the ffprobe binary on the system, e.g. `C:/ffmpeg/bin/ffprobe.exe`)
  - `ffmpegtimeout` → (Required) The timeout for the underlying process. (Default: 3600)
- - `ffmpegthreads` → (Required) The number of threads that FFMpeg should use. (Default: 12)
+ - `ffmpegthreads` → (Required) The number of threads that FFMpeg should use. (Default: 2)
  - `ffmpegaudiocodec` → (Required) Sets the audio codec for video transcoding. For audio transcoding, the default and only available codec is libmp3lame.
  - `ffmpegadditionalparamsvideo` → You can specify additional parameters to be added to video encoding tasks. This must be entered in valid json format, e.g. `{"-vf": "scale=-1:720", "-r": "30", "-vprofile": "main", "-level": "3.1", "-b:a": "160k", "-ar": "48000", "-ac": "2", "-movflags": "+faststart"}`
  - `ffmpegadditionalparamsaudio` → You can specify additional parameters to be added to audio encoding tasks. This must be entered in valid json format, e.g. `{"-vf": "scale=-1:720", "-r": "30", "-vprofile": "main", "-level": "3.1", "-b:a": "160k", "-ar": "48000", "-ac": "2", "-movflags": "+faststart"}`

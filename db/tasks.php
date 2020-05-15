@@ -17,7 +17,7 @@
  * Task definition for the plugin.
  *
  * @package   tool_transcoder
- * @copyright 2020 Michael Vangelovski <michael.vangelovski@gmail.com>
+ * @copyright 2020 Michael Vangelovski 
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();

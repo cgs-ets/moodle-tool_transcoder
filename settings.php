@@ -18,7 +18,7 @@
  * Plugin settings and presets.
  *
  * @package   tool_transcoder
- * @copyright 2020 Michael Vangelovski <michael.vangelovski@gmail.com>
+ * @copyright 2020 Michael Vangelovski 
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -60,7 +60,7 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configtext('tool_transcoder/ffmpegthreads',
         get_string('ffmpegthreads', 'tool_transcoder'),
-        get_string('ffmpegthreads_desc', 'tool_transcoder'), 12, PARAM_INT));
+        get_string('ffmpegthreads_desc', 'tool_transcoder'), 2, PARAM_INT));
 
     $settings->add(new admin_setting_configtext('tool_transcoder/ffmpegaudiocodec',
         get_string('ffmpegaudiocodec', 'tool_transcoder'),
@@ -98,7 +98,7 @@ if ($hassiteconfig) {
     $name = 'tool_transcoder/contentareas';
     $visiblename = get_string('contentareas', 'tool_transcoder');
     $description = get_string('contentareas_desc', 'tool_transcoder');
-    //component__filearea__table__column
+    //Key format: component__filearea__table__column
     $defaultsetting = $choices = array(
         'mod_assign__intro__assign__intro' => 'Assignment Description',
         'assignsubmission_onlinetext__submissions_onlinetext__assignsubmission_onlinetext__onlinetext' => 'Assignment Online Submission',

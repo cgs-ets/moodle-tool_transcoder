@@ -19,7 +19,7 @@
  * The actual conversion effort is divided into independent adhoc tasks.
  *
  * @package   tool_transcoder
- * @copyright 2020 Michael Vangelovski <michael.vangelovski@gmail.com>
+ * @copyright 2020 Michael Vangelovski 
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -52,7 +52,7 @@ class crawler extends \core\task\scheduled_task {
         $this->log_start("Starting crawler task.");
 
         // Check required settings.
-        if (!check_required_fields()) {
+        if (!has_required_settings()) {
             $this->log_finish("Error → Missing required settings. See README.");
             return;
         }

@@ -18,7 +18,7 @@
  * Privacy Subsystem implementation for tool_transcoder.
  *
  * @package   tool_transcoder
- * @copyright 2020 Michael Vangelovski <michael.vangelovski@gmail.com>
+ * @copyright 2020 Michael Vangelovski 
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * Privacy Subsystem for tool_transcoder implementing null_provider.
  *
  * @package   tool_transcoder
- * @copyright 2020 Michael Vangelovski <michael.vangelovski@gmail.com>
+ * @copyright 2020 Michael Vangelovski 
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {
