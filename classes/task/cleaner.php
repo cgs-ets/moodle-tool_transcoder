@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Cleaner task for transcoder
+ * Cleaner task for transcoder. This task should run daily.
  *
  * @package   tool_transcoder
  * @copyright 2020 Michael Vangelovski 
@@ -59,108 +59,22 @@ class cleaner extends \core\task\scheduled_task {
         // Load the settings.
         $config = get_config('tool_transcoder');
 
-        // Look for tasks that have been in-progress for more than 24 hours. These are likely failed conversions.
-        $this->log("Cleaning old in-progress tasks.", 1);
-        $expiry = time() - $config->processexpiry * 60;
-
-        // If retried 3 times just move to failed state.
-        $sql = "UPDATE {transcoder_tasks} 
-        		   SET status = ?
-                 WHERE status = ?
-                   AND timestarted <= ?
-                   AND retries > ?";
-        $params = array();
-        $params[] = TRANSCODER_STATUS_FAILED;
-        $params[] = TRANSCODER_STATUS_INPROGRESS;
-        $params[] = $expiry;
-        $params[] = $config->retries;
-        $DB->execute($sql, $params);
-
-        // Retry up to 3 times.
-        $sql = "UPDATE {transcoder_tasks} 
-        		   SET status = ?, 
-        		       retries = (retries + 1)
-                 WHERE status = ?
-                   AND timestarted <= ?
-                   AND retries <= ?";
-        $params = array();
-        $params[] = TRANSCODER_STATUS_READY;
-        $params[] = TRANSCODER_STATUS_INPROGRESS;
-        $params[] = $expiry;
-        $params[] = $config->retries;
-        $DB->execute($sql, $params);
-
-        // Check references to transcoded files still exist.
-        // Get list of completed transcoded files.
+        // Delete transcoded files if original file deleted.
         $sql = "SELECT *
-                  FROM {transcoder_tasks} 
+                  FROM {transcoder_tasks}
                  WHERE status = ?
               ORDER BY timequeued ASC, id ASC";
         $tasks = $DB->get_records_sql($sql, array(TRANSCODER_STATUS_COMPLETED));
         foreach ($tasks as $task) {
-            $file = $DB->get_record('files', array('id' => $task->fileid));
-            if (empty($file)) {
+            if ( ! $DB->record_exists('files', array('id' => $task->fileid))) {
                 $this->log("Deleting transcoded files as the original file was not found.", 2);
-                $this->delete_newfile_from_task($task);
+                delete_newfile_from_task($task);
                 continue;
-            }
-
-            $newfile = $DB->get_record('files', array('id' => $task->newfileid));
-            if (empty($newfile)) {
-                continue;
-            }
-
-            // Find content references to the files.
-            $found1 = array_filter(find_filename_in_content($file, $this->get_trace()));
-            $found2 = array_filter(find_filename_in_content($newfile, $this->get_trace()));
-
-            // Check whether there are any references to the original and transcoded files.
-            if (empty($found1) && empty($found2)) {
-                $this->log("Deleting transcoded files as neither the original file nor the transcoded files were referenced in any content.", 2);
-                $this->delete_newfile_from_task($task);
-                continue;
-            }
-
-            // If the transcoded file is not referenced where the original file is, pop a reference into the html.
-            $htmltag = explode('/', $file->mimetype)[0];
-            foreach ($found1 as $tablecol => $entries) {
-                if (isset($found2[$tablecol])) {
-                    $ids = array_diff(array_keys($entries), array_keys($found2[$tablecol]));
-                    if ($ids) {
-                        $table = explode('__', $tablecol)[2];
-                        $col = explode('__', $tablecol)[3];
-                        $entries = array_filter($entries, function ($key) use ($ids) { return in_array($key, $ids); }, ARRAY_FILTER_USE_KEY );
-                        $this->log("Transcoded file $task->newfileid was missing in $table entries " . json_encode($ids) . ", adding back in.", 1);
-                        update_html_source($this->get_trace(), $file, $newfile, $entries, $table, $col, $htmltag);
-                    }
-                }
             }
         }
 
         $this->log_finish('Cleaner task finished.');
         return 0;
-    }
-
-    private function delete_newfile_from_task($task) {
-        global $DB, $CFG;
-
-        $deletefile = $DB->get_record('files', array('id' => $task->newfileid));
-        if ($deletefile) {
-            // Delete the file record.
-            $DB->delete_records('files', array('id' => $deletefile->id));
-
-            $dir = str_replace('\\\\', '\\', $CFG->dataroot) . 
-            '\filedir\\' . substr($deletefile->contenthash, 0, 2) . 
-            '\\' . substr($deletefile->contenthash, 2, 2) . 
-            '\\';
-
-            // Delete the physical files.
-            $trashdir = str_replace('\\\\', '\\', $CFG->dataroot) . '\trashdir\\';
-            rename($dir . $deletefile->contenthash, $trashdir . $deletefile->contenthash);
-        }
-
-        // Delete the transcoder_tasks record.
-        $DB->delete_records('transcoder_tasks', array('id' => $task->id));
     }
 
 }

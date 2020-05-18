@@ -33,10 +33,19 @@ $tasks = array(
         'month' => '*'
     ),
     array(
-        'classname' => 'tool_transcoder\task\cleaner',
+        'classname' => 'tool_transcoder\task\checker',
         'blocking' => 0,
         'minute' => '*',
         'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+    array(
+        'classname' => 'tool_transcoder\task\cleaner',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '20',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'

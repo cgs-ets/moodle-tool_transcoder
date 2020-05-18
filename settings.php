@@ -139,4 +139,8 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext('tool_transcoder/filesfromtime',
         get_string('filesfromtime', 'tool_transcoder'),
         get_string('filesfromtime_desc', 'tool_transcoder'), 0, PARAM_INT));
+
+    $settings->add(new admin_setting_configtext('tool_transcoder/refchecktime',
+        get_string('refchecktime', 'tool_transcoder'),
+        get_string('refchecktime_desc', 'tool_transcoder'), 30, PARAM_INT));
 }

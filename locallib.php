@@ -58,7 +58,7 @@ function find_filename_in_content($file, $trace) {
         if ($file->component != $component || $file->filearea != $filearea) {
             continue;
         }
-        $trace->output("Looking for uses within component $component, filearea $filearea, table $table, col $col.", 2);
+        $trace->output("Looking for uses of file $file->id within component $component, filearea $filearea, table $table, col $col.", 2);
         $matches[$contentarea] = find_filename_in_table_col($file, $table, $col);
     }
 
@@ -272,4 +272,31 @@ function has_required_settings() {
     }
 
     return true;
+}
+
+/**
+ * Deletes a file record based on $task->newfileid.
+ *
+ * @param stdClass $task. 
+ */
+function delete_newfile_from_task($task) {
+    global $DB, $CFG;
+
+    $deletefile = $DB->get_record('files', array('id' => $task->newfileid));
+    if ($deletefile) {
+        // Delete the file record.
+        $DB->delete_records('files', array('id' => $deletefile->id));
+
+        $dir = str_replace('\\\\', '\\', $CFG->dataroot) . 
+        '\filedir\\' . substr($deletefile->contenthash, 0, 2) . 
+        '\\' . substr($deletefile->contenthash, 2, 2) . 
+        '\\';
+
+        // Delete the physical files.
+        $trashdir = str_replace('\\\\', '\\', $CFG->dataroot) . '\trashdir\\';
+        rename($dir . $deletefile->contenthash, $trashdir . $deletefile->contenthash);
+    }
+
+    // Delete the transcoder_tasks record.
+    $DB->delete_records('transcoder_tasks', array('id' => $task->id));
 }
