@@ -141,21 +141,17 @@ class transcoder extends \core\task\adhoc_task {
                 $tempphysicalname = $file->contenthash . '_transcoder_' . $datestamp . $fileextension; // File ext required for ffmpeg
                 transcode_audio_using_ffmpeg($dir, $file->contenthash, $tempphysicalname);
                 break;
-            case "document/unknown":
-                if (substr_compare($file->filename, '.heic', -strlen('.heic')) === 0) { // String ends with ".heic".
-                    $htmltag = 'img';
-                    $newmimetype = 'image/jpg';
-                    $fileextension = '.jpg';
-                    $tempphysicalname = $file->contenthash . '_transcoder_' . $datestamp . $fileextension;
-                    convert_image_using_imagemagick($dir, $file->contenthash, $tempphysicalname);
-                } else {
-                    $this->log("Exiting → Unhandled mimetype $file->mimetype. Filename $file->filename.", 1);
-                    return;
-                }
-                break;
           default:
-            $this->log("Exiting → Unhandled mimetype $file->mimetype.", 1);
-            return;
+            if (substr_compare($file->filename, '.heic', -strlen('.heic')) === 0) { // String ends with ".heic".
+                $htmltag = 'img';
+                $newmimetype = 'image/jpg';
+                $fileextension = '.jpg';
+                $tempphysicalname = $file->contenthash . '_transcoder_' . $datestamp . $fileextension;
+                convert_image_using_imagemagick($dir, $file->contenthash, $tempphysicalname);
+            } else {
+                $this->log("Exiting → Unhandled mimetype $file->mimetype. Filename $file->filename.", 1);
+                return;
+            }
         }
         $this->log('Transcoding finished.', 1);
 
