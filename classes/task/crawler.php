@@ -64,16 +64,6 @@ class crawler extends \core\task\scheduled_task {
         $timefrom = $config->filesfromtime ? $config->filesfromtime : 0;
         $this->log("Looking for files created after $timefrom (unix timestamp).", 1);
 
-        // Get selected mimetypes.
-        $mimetypes = explode(',', $config->mimetypes);
-        list($mimesql, $mimeparams) = $DB->get_in_or_equal($mimetypes);
-
-        // HEIC files do not have a mimetype in mdl_files therefore we have to use the filename.
-        $sqlmimebyfilename = '';
-        if (in_array('image/heic', $mimetypes)) {
-            $sqlmimebyfilename .= " OR filename LIKE '%.heic' ";
-        }
-
         // Limit file search to components with HTML fields we'll be checking.
         $searchareas = explode(',', $config->contentareas);
         $componentsqlarr = array();
@@ -83,6 +73,16 @@ class crawler extends \core\task\scheduled_task {
             $componentparams[] = explode('__', $contentarea)[0];
         }
         $componentsql = implode(' OR ', $componentsqlarr);
+
+        // Get selected mimetypes.
+        $mimetypes = explode(',', $config->mimetypes);
+        list($mimesql, $mimeparams) = $DB->get_in_or_equal($mimetypes);
+
+        // HEIC files do not have a mimetype in mdl_files therefore we have to use the filename.
+        $sqlmimebyfilename = '';
+        if (in_array('image/heic', $mimetypes)) {
+            $sqlmimebyfilename .= " OR filename LIKE '%.heic' ";
+        }
 
         // Build the SQL.
         $sql = "SELECT *
