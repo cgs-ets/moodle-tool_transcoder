@@ -1,5 +1,14 @@
 # Transcoder plugin for Moodle.
-An admin tool created to improve the browser compatibility of WebRTC based video and audio recordings. WebRTC recording is a feature of the Atto editor that allows users to record direct from their webcams and microphones. Behind the scenes, the file formats produced are webm for video and ogg for audio which do not have native support in Safari and iDevices. The transcoder plugin automatically crawls Moodle's file store and a number of content types (e.g. pages, forums, assignments, labels) for webm video and ogg audio files. It then uses FFmpeg to transcode them to H.264 AAC mp4 for video and mp3 for audio. The new file is stored with the original file, and the `video` or `audio` HTML5 tag within the activity HTML is automatically updated to include the transcoded file as an additional source. The original format is preserved as the first source. The default or example settings are optimised so that the transcoded files play natively within browsers on iDevices.
+An admin tool created to improve the browser compatibility of media files, such as WebRTC based video and audio recordings. The transcoder plugin automatically crawls Moodle's file store and a number of content types (e.g. pages, forums, assignments, labels) for configured file types, including heic images, webm video and ogg audio files. It then uses FFmpeg to transcode them to jpg for images, H.264 AAC mp4 for video and mp3 for audio. 
+
+### Videos
+WebRTC recording is a feature of the Atto editor that allows users to record direct from their webcams and microphones. The file formats produced for video recordings is webm which does not have native support in Safari and iDevices. Webm files are transcoded to mp4 using FFmpeg. The new file is stored with the original file, and the `video` HTML5 tag within the activity HTML is automatically updated to include the transcoded file as an additional source. The original format is preserved as the first source. The default or example settings are optimised so that the transcoded files play natively within browsers on iDevices.
+
+### Audio
+WebRTC recording is a feature of the Atto editor that allows users to record direct from their webcams and microphones. The file format produced using WebRTC audio recording is ogg which does not have native support in Safari and iDevices. Ogg files are converted to mp3 using FFmpeg. The new file is stored with the original file, and the `audio` HTML5 tag within the activity HTML is automatically updated to include the transcoded file as an additional source. The original format is preserved as the first source.
+
+### Images
+HEIC to JPG conversion. The new file is stored in the same directory as the original file, and the `src` attribute of the `img` tag is automatically updated to use the JPG image.
 
 ## Author
 [Michael Vangelovski](https://github.com/michaelvangelovski/)
@@ -37,7 +46,7 @@ An admin tool created to improve the browser compatibility of WebRTC based video
  - `ffmpegaudiokilobitrate` → (Required) The bitrate in kilobytes to be used for audio encoding tasks. (Default: 48000)
  - `ffmpegaudiochannels` → (Required) The number of channels to be used for audio encoding tasks. (Default: 2)
  - `contentareas` → (Required) The activity types and fields to look into when looking for references to video/audio files. (Default: all)
- - `mimetypes` → (Required) The formats to detect and transcode. (Default: video/webm, audio/ogg)
+ - `mimetypes` → (Required) The formats to detect and transcode. (Default: video/webm, audio/ogg, image/heic)
  - `processexpiry` → (Required) The number of minutes to allow an in-progress transcoding task to run before it is retried. Set this value high enough to give files enough time to transcode. This will depend on your length, upload and concurrency limits, as well as how well your server is resourced. At the same time, try to keep this value is low as possible so that multiple failed in-progress tasks do not block new tasks due to the concurrency limit. (Default: 30)
  - `retries` → (Required) The number of times to retry failed transcoding tasks. (Default: 2)
  - `filesfromtime` → Files created after this time (unix timestamp) will be crawled. This setting is automatically updated to the current time each time the crawler task runs so that only new files are crawled. (Default: 0)

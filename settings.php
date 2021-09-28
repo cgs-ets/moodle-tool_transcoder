@@ -94,6 +94,9 @@ if ($hassiteconfig) {
      *   url, intro = URL Introduction
      *   wiki, intro = Wiki Introduction
      *   wiki_pages, cachedcontent = Wiki Pages
+     *   * Customisations
+     *   local_announcements, announcement = Announcement Message
+     *   local_myconnect, comment = MyConnect Posts
      */
     $name = 'tool_transcoder/contentareas';
     $visiblename = get_string('contentareas', 'tool_transcoder');
@@ -115,7 +118,9 @@ if ($hassiteconfig) {
         'mod_quiz__intro__quiz__intro' => 'Quiz Introduction',
         'mod_url__intro__url__intro' => 'URL Introduction',
         'mod_wiki__intro__wiki__intro' => 'Wiki Introduction',
-        'mod_wiki__cachedcontent__wiki_pages__cachedcontent' => 'Wiki Pages'
+        'mod_wiki__cachedcontent__wiki_pages__cachedcontent' => 'Wiki Pages',
+        'local_announcements__announcement__ann_posts__message' => 'Announcement Messages',
+        'local_myconnect__comment__myconnect_posts__comment' => 'MyConnect Posts',
     );
     $contentareas = new admin_setting_configmulticheckbox($name, $visiblename, $description, $defaultsetting, $choices);
     $settings->add($contentareas);
@@ -124,7 +129,7 @@ if ($hassiteconfig) {
     $name = 'tool_transcoder/mimetypes';
     $visiblename = get_string('mimetypes', 'tool_transcoder');
     $description = get_string('mimetypes_desc', 'tool_transcoder');
-    $defaultsetting = $choices = array('video/webm' => 'video/webm', 'audio/ogg' => 'audio/ogg');
+    $defaultsetting = $choices = array('video/webm' => 'video/webm', 'audio/ogg' => 'audio/ogg', 'image/heic' => 'image/heic');
     $transcodeformats = new admin_setting_configmulticheckbox($name, $visiblename, $description, $defaultsetting, $choices);
     $settings->add($transcodeformats);
 

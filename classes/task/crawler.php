@@ -64,9 +64,16 @@ class crawler extends \core\task\scheduled_task {
         $timefrom = $config->filesfromtime ? $config->filesfromtime : 0;
         $this->log("Looking for files created after $timefrom (unix timestamp).", 1);
 
-        // Look for video and audio files.
+        // Get selected mimetypes.
         $mimetypes = explode(',', $config->mimetypes);
         list($mimesql, $mimeparams) = $DB->get_in_or_equal($mimetypes);
+
+        // HEIC files do not have a mimetype in mdl_files therefore we have to use the filename.
+        $sqlmimebyfilename = '';
+        if (in_array('image/heic', $mimetypes)) {
+            $sqlmimebyfilename .= " OR filename LIKE '%.heic' ";
+        }
+
         // Limit file search to components with HTML fields we'll be checking.
         $searchareas = explode(',', $config->contentareas);
         $componentsqlarr = array();
@@ -76,14 +83,20 @@ class crawler extends \core\task\scheduled_task {
             $componentparams[] = explode('__', $contentarea)[0];
         }
         $componentsql = implode(' OR ', $componentsqlarr);
+
+        // Build the SQL.
         $sql = "SELECT *
                 FROM {files}
-                WHERE (mimetype $mimesql)
-                AND ($componentsql)
-                AND timecreated > ?
+                WHERE timecreated > ?
+                AND ($componentsql) 
+                AND (
+                    (mimetype $mimesql) 
+                    $sqlmimebyfilename
+                )
                 ORDER BY id ASC";
-        $params = array_merge($mimeparams, $componentparams);
+        $params = array();
         $params[] = $timefrom;
+        $params = array_merge($params, $componentparams, $mimeparams);
 
         // Update filesfromtime setting to now so that we only crawl new files.
         // This is intentionally done before querying the file store to ensure no file is ever missed.
@@ -103,10 +116,12 @@ class crawler extends \core\task\scheduled_task {
 
             // If this video is not referenced anywhere, no need to transcode it.
             if (empty($results)) {
-                $this->log("Skipping as file was not referenced in any content.", 2);
-                continue;
+                //$this->log("Skipping as file was not referenced in any content.", 2);
+                //continue;
+                $this->log("File was not referenced in any content but transcoding in case used in attachments.", 2);
+            } else {
+                $this->log("Content references found. Queuing file for transcoding.", 2);
             }
-            $this->log("Content references found. Queuing file for transcoding.", 2);
 
             // Add a new task to the custom table.
             $DB->insert_record('transcoder_tasks', array('fileid' => $file->id, 'timequeued' => time()));

@@ -125,8 +125,11 @@ class checker extends \core\task\scheduled_task {
 
                 // Check whether there are any references to the original and transcoded files.
                 if (empty($found1) && empty($found2)) {
-                    $this->log("Deleting transcoded files as neither the original file nor the transcoded files were referenced in any content.", 2);
-                    delete_newfile_from_task($task);
+                    //$this->log("Deleting transcoded files as neither the original file nor the transcoded files were referenced in any content.", 2);
+                    //delete_newfile_from_task($task);
+                    //continue;
+
+                    $this->log("Neither the original file nor the transcoded files were referenced in any content. Leaving them in place as they may be attachments.", 2);
                     continue;
                 }
 

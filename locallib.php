@@ -52,7 +52,7 @@ function find_filename_in_content($file, $trace) {
         $filearea = explode('__', $contentarea)[1];
         $table = explode('__', $contentarea)[2];
         $col = explode('__', $contentarea)[3];
-        // Only look at in the content area that the original file was added to. If the file has 
+        // Only look at the content area that the original file was added to. If the file has 
         // been copied to another area a separate file record will exist for it and it will be
         // checked independently.
         if ($file->component != $component || $file->filearea != $filearea) {
@@ -107,7 +107,7 @@ function update_html_source($trace, $file, $newfile, $entries, $table, $htmlcol,
         foreach($tags as $tag) {
             // Check whether the file in the entry content is the one we've just transcoded.
             if (strpos($tag, $file->filename) !== false) {
-                // Get source elements and remove references to previously transoded files.
+                // Get source elements and remove references to previously transcoded files (relevant if transcoding the same file again).
                 $sources = $tag->find('source');
                 foreach ($sources as $source) {
                     $src = str_replace('@@PLUGINFILE@@/', '', $source->getAttribute('src'));
@@ -246,6 +246,29 @@ function transcode_audio_using_ffmpeg($dir, $filename, $newphysicalname) {
     // Save the video in the same directory with the new format.
     $audio->save($format, $dir . $newphysicalname);
 }
+
+/**
+ * Converts an image file using ImageMagick and saves the new file in the same directory.
+ *
+ * @param string $dir Physical path of the file.
+ * @param string $filename Name of the file including file extension.
+ * @param string $newphysicalname The new filename of the file including file extension.
+ * @return void.
+ */
+function convert_image_using_imagemagick($dir, $filename, $newphysicalname) {
+
+    $oldfile = $dir . $filename;
+    $newfile = $dir . $newphysicalname;
+    $command = "magick convert $oldfile $newfile";
+    $output=null;
+    $retval=null;
+    exec($command, $output, $retval);
+    //var_export($command);
+    //var_export($output);
+    //var_export($retval);
+    //exit;
+}
+
 
 /**
  * Checks whether the required plugin settings have been configured.

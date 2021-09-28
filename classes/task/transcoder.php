@@ -131,16 +131,28 @@ class transcoder extends \core\task\adhoc_task {
         $datestamp = date("YmdHis", time());
         $tempphysicalname = $file->contenthash . '_transcoder_' . $datestamp . $fileextension; // File ext required for ffmpeg
         switch ($file->mimetype) {
-          case "video/webm":
-            transcode_video_using_ffmpeg($dir, $file->contenthash, $tempphysicalname);
-            break;
-          case "audio/ogg":
-            $htmltag = 'audio';
-            $newmimetype = 'audio/mp3';
-            $fileextension = '.mp3';
-            $tempphysicalname = $file->contenthash . '_transcoder_' . $datestamp . $fileextension; // File ext required for ffmpeg
-            transcode_audio_using_ffmpeg($dir, $file->contenthash, $tempphysicalname);
-            break;
+            case "video/webm":
+                transcode_video_using_ffmpeg($dir, $file->contenthash, $tempphysicalname);
+                break;
+            case "audio/ogg":
+                $htmltag = 'audio';
+                $newmimetype = 'audio/mp3';
+                $fileextension = '.mp3';
+                $tempphysicalname = $file->contenthash . '_transcoder_' . $datestamp . $fileextension; // File ext required for ffmpeg
+                transcode_audio_using_ffmpeg($dir, $file->contenthash, $tempphysicalname);
+                break;
+            case "document/unknown":
+                if (substr_compare($file->filename, '.heic', -strlen('.heic')) === 0) { // String ends with ".heic".
+                    $htmltag = 'img';
+                    $newmimetype = 'image/jpg';
+                    $fileextension = '.jpg';
+                    $tempphysicalname = $file->contenthash . '_transcoder_' . $datestamp . $fileextension;
+                    convert_image_using_imagemagick($dir, $file->contenthash, $tempphysicalname);
+                } else {
+                    $this->log("Exiting → Unhandled mimetype $file->mimetype. Filename $file->filename.", 1);
+                    return;
+                }
+                break;
           default:
             $this->log("Exiting → Unhandled mimetype $file->mimetype.", 1);
             return;
@@ -173,7 +185,7 @@ class transcoder extends \core\task\adhoc_task {
         $task->newfileid = $DB->insert_record('files', $newfile);
         $DB->update_record('transcoder_tasks', $task);
 
-        // Update the HTML references to the file.
+        // Update the HTML references to the file. Not all files (e.g. attachments) will have content references.
         $this->log('Searching for HTML references to update.', 1);
         $found = array_filter(find_filename_in_content($file, $this->get_trace()));
         foreach ($found as $tablecol => $entries) {
