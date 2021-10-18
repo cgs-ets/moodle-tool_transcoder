@@ -142,7 +142,7 @@ class transcoder extends \core\task\adhoc_task {
                 transcode_audio_using_ffmpeg($dir, $file->contenthash, $tempphysicalname);
                 break;
           default:
-            if (substr_compare($file->filename, '.heic', -strlen('.heic')) === 0) { // String ends with ".heic".
+            if (substr_compare(strtolower($file->filename), '.heic', -strlen('.heic')) === 0) { // String ends with ".heic".
                 $htmltag = 'img';
                 $newmimetype = 'image/jpg';
                 $fileextension = '.jpg';
@@ -168,7 +168,7 @@ class transcoder extends \core\task\adhoc_task {
         rename($dir . $tempphysicalname, $dir . $newfile->contenthash);
         // Set other file values.
         $info = pathinfo($file->filename);
-        $newfile->filename = $newfile->source = $info['filename'] . '_transcoder_' . $datestamp . $fileextension;
+        $newfile->filename = $newfile->source = $info['filename'] . '_transcoded_' . $datestamp . $fileextension;
         $contentpath = "/$file->contextid/$file->component/$file->filearea/$file->itemid/$newfile->filename";
         $newfile->pathnamehash = sha1($contentpath);
         $newfile->filesize = filesize($dir . $newfile->contenthash);
@@ -181,14 +181,24 @@ class transcoder extends \core\task\adhoc_task {
         $task->newfileid = $DB->insert_record('files', $newfile);
         $DB->update_record('transcoder_tasks', $task);
 
+        // In the case of portfolio attachments, remove the old heic, leaving only the jpg.
+        if ($file->component == 'mod_giportfolio' && $file->filearea == 'attachment') {
+            $this->log('File was a portfolio attachment, orphaning the original file.', 1);
+            $file->filearea = 'attachmentx';
+            $DB->update_record('files', $file);
+        }
+
         // Update the HTML references to the file. Not all files (e.g. attachments) will have content references.
-        $this->log('Searching for HTML references to update.', 1);
-        $found = array_filter(find_filename_in_content($file, $this->get_trace()));
-        foreach ($found as $tablecol => $entries) {
-            $table = explode('__', $tablecol)[2];
-            $col = explode('__', $tablecol)[3];
-            $this->log("Adding transcoded source $task->newfileid into $table entries " . json_encode(array_keys($entries)), 1);
-            update_html_source($this->get_trace(), $file, $newfile, $entries, $table, $col, $htmltag);
+        // Only do this for video and audio.
+        if ($htmltag == 'video' || $htmltag == 'audio') {
+            $this->log('Searching for HTML references to update.', 1);
+            $found = array_filter(find_filename_in_content($file, $this->get_trace()));
+            foreach ($found as $tablecol => $entries) {
+                $table = explode('__', $tablecol)[2];
+                $col = explode('__', $tablecol)[3];
+                $this->log("Adding transcoded source $task->newfileid into $table entries " . json_encode(array_keys($entries)), 1);
+                update_html_source($this->get_trace(), $file, $newfile, $entries, $table, $col, $htmltag);
+            }
         }
 
         $task->status = TRANSCODER_STATUS_COMPLETED;

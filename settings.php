@@ -97,6 +97,7 @@ if ($hassiteconfig) {
      *   * Customisations
      *   local_announcements, announcement = Announcement Message
      *   local_myconnect, comment = MyConnect Posts
+     *   mod_giportfolio, contribution = Portfolio Contributions
      */
     $name = 'tool_transcoder/contentareas';
     $visiblename = get_string('contentareas', 'tool_transcoder');
@@ -119,8 +120,9 @@ if ($hassiteconfig) {
         'mod_url__intro__url__intro' => 'URL Introduction',
         'mod_wiki__intro__wiki__intro' => 'Wiki Introduction',
         'mod_wiki__cachedcontent__wiki_pages__cachedcontent' => 'Wiki Pages',
-        'local_announcements__announcement__ann_posts__message' => 'Announcement Messages',
+        'local_announcements__announcement__ann_posts__message' => 'Announcement Messages', // Will also pick up attachments based on component.
         'local_myconnect__comment__myconnect_posts__comment' => 'MyConnect Posts',
+        'mod_giportfolio__contribution__giportfolio_contributions__content' => 'Portfolio Contributions', // Will also pick up attachments based on component.
     );
     $contentareas = new admin_setting_configmulticheckbox($name, $visiblename, $description, $defaultsetting, $choices);
     $settings->add($contentareas);
