@@ -108,6 +108,9 @@ class transcoder extends \core\task\adhoc_task {
         $file = $DB->get_record('files', array('id' => $task->fileid));
         if (empty($file)) {
             $this->log_finish("Exiting → Failed to find file record $task->fileid");
+            $task->status = TRANSCODER_STATUS_FAILED;
+            $task->timefinished = time();
+            $DB->update_record('transcoder_tasks', $task);
             return;
         }
 
