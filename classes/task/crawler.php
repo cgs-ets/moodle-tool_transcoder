@@ -82,6 +82,7 @@ class crawler extends \core\task\scheduled_task {
         $sqlmimebyfilename = '';
         if (in_array('image/heic', $mimetypes)) {
             $sqlmimebyfilename .= " OR filename LIKE '%.heic' ";
+            $sqlmimebyfilename .= " OR filename LIKE '%.HEIC' ";
         }
 
         // Build the SQL.
