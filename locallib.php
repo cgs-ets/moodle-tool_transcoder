@@ -111,7 +111,7 @@ function update_html_source($trace, $file, $newfile, $entries, $table, $htmlcol,
                 $sources = $tag->find('source');
                 foreach ($sources as $source) {
                     $src = str_replace('@@PLUGINFILE@@/', '', $source->getAttribute('src'));
-                    if (strpos($src, '_transcoder_') !== false) {
+                    if (strpos($src, '_transcoded_') !== false) {
                         $trace->output("Removing an existing transcoded source → $src", 2);
                         $source->delete();
                         unset($source);

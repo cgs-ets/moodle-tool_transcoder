@@ -132,7 +132,7 @@ class transcoder extends \core\task\adhoc_task {
         $newmimetype = 'video/mp4';
         $fileextension = '.mp4';
         $datestamp = date("YmdHis", time());
-        $tempphysicalname = $file->contenthash . '_transcoder_' . $datestamp . $fileextension; // File ext required for ffmpeg
+        $tempphysicalname = $file->contenthash . '_transcoded_' . $datestamp . $fileextension; // File ext required for ffmpeg
         switch ($file->mimetype) {
             case "video/webm":
                 transcode_video_using_ffmpeg($dir, $file->contenthash, $tempphysicalname);
@@ -141,7 +141,7 @@ class transcoder extends \core\task\adhoc_task {
                 $htmltag = 'audio';
                 $newmimetype = 'audio/mp3';
                 $fileextension = '.mp3';
-                $tempphysicalname = $file->contenthash . '_transcoder_' . $datestamp . $fileextension; // File ext required for ffmpeg
+                $tempphysicalname = $file->contenthash . '_transcoded_' . $datestamp . $fileextension; // File ext required for ffmpeg
                 transcode_audio_using_ffmpeg($dir, $file->contenthash, $tempphysicalname);
                 break;
           default:
@@ -149,7 +149,7 @@ class transcoder extends \core\task\adhoc_task {
                 $htmltag = 'img';
                 $newmimetype = 'image/jpg';
                 $fileextension = '.jpg';
-                $tempphysicalname = $file->contenthash . '_transcoder_' . $datestamp . $fileextension;
+                $tempphysicalname = $file->contenthash . '_transcoded_' . $datestamp . $fileextension;
                 convert_image_using_imagemagick($dir, $file->contenthash, $tempphysicalname);
             } else {
                 $this->log("Exiting → Unhandled mimetype $file->mimetype. Filename $file->filename.", 1);
