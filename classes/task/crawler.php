@@ -88,7 +88,7 @@ class crawler extends \core\task\scheduled_task {
         // Build the SQL.
         $sql = "SELECT *
                 FROM {files}
-                WHERE timecreated > ?
+                WHERE timemodified > ?
                 AND ($componentsql) 
                 AND (
                     (mimetype $mimesql) 
