@@ -96,7 +96,7 @@ class crawler extends \core\task\scheduled_task {
                 )
                 ORDER BY id ASC";
         $params = array();
-        $params[] = $timefrom;
+        $params[] = $timefrom - 60*60*24; // Look back 24 hours just in case.
         $params = array_merge($params, $componentparams, $mimeparams);
 
         // Update filesfromtime setting to now so that we only crawl new files.
